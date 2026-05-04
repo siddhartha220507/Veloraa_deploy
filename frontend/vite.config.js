@@ -6,18 +6,12 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   build: {
-    target: 'esnext',
+    target: 'es2020',
     minify: 'esbuild',
     cssMinify: true,
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'vendor-react';
-            if (id.includes('framer-motion') || id.includes('lucide-react')) return 'vendor-ui';
-            return 'vendor';
-          }
-        }
+        // Removing manualChunks to avoid Rolldown binding errors
       }
     },
     chunkSizeWarningLimit: 1000
