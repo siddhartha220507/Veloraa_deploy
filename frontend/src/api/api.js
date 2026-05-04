@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+  import.meta.env.VITE_API_URL || 'https://veloraa-deploy-zwk4.onrender.com/api';
 
 /** Socket.IO server origin (no /api suffix). */
 export const SOCKET_ORIGIN =
