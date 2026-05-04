@@ -4,11 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js",
-    "sync:frontend-dist": "node ./scripts/syncFrontendDist.js",
-    "build": "echo 'Backend build successful!'",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "echo 'Backend build pass!'"
   },
   "keywords": [],
   "author": "",
