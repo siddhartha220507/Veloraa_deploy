@@ -107,7 +107,7 @@ exports.oauthSuccess = (req, res) => {
 
     // 🌟 PROFESSIONAL SDE FIX: JSON dikhane ki jagah seedha React App par redirect maaro 
     // Token ko URL me pass kar rahe hain taaki React use catch kar sake
-    res.redirect(`${frontendUrl}/auth/success?token=${encodeURIComponent(token)}`);
+    res.redirect(`${frontendUrl}/?token=${encodeURIComponent(token)}`);
 };
 
 // ==========================================
