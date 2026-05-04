@@ -25,13 +25,17 @@ const app = express();
 // Trust proxy for Railway/Vercel production environments 🛡️
 app.set('trust proxy', 1);
 
+const { isAllowedOrigin, sessionCookieSameSite, sessionCookieSecure } = require('./config/runtime');
+
 // --- MIDDLEWARES ---
 
 // 1. Compression for faster responses 🚀
 app.use(compression());
 
 // 2. Helmet for Security Headers
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 // 3. Rate Limiting to prevent DDoS/Abuse 🛡️
 const limiter = rateLimit({
@@ -41,36 +45,37 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// 3. Session sabse pehle aayega
+// 4. Session sabse pehle aayega
 app.use(session({
     secret: process.env.SESSION_SECRET || 'mera_super_secret',
     resave: false,
     saveUninitialized: false,
+    proxy: true, // Required for secure cookies behind reverse proxy
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        secure: sessionCookieSecure,
         httpOnly: true,
-        sameSite: 'strict'
+        sameSite: sessionCookieSameSite,
+        maxAge: 30 * 24 * 60 * 60 * 1000
     }
 }));
 
-// 4. Passport initialize hoga session ke BAAD
+// 5. Passport initialize hoga session ke BAAD
 app.use(passport.initialize());
 app.use(passport.session());
 
-// 5. CORS
-const allowedOrigins = new Set([
-    process.env.FRONTEND_URL,
-    'http://localhost:5173',
-    'http://localhost:5174'
-].filter(Boolean));
-
+// 6. CORS - Synchronized with runtime.js
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.has(origin)) return callback(null, true);
-        return callback(new Error(`CORS blocked for origin: ${origin}`));
+        if (isAllowedOrigin(origin)) {
+            callback(null, true);
+        } else {
+            console.warn(`CORS blocked for origin: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
     },
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // 6. Body Parsers
